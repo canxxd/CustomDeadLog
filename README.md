@@ -13,4 +13,3 @@ CanXD:
 
 olum-zamani: 2025-08-08_17-37-14 envanter:
 tur: COMPASS adet: 1
-bilgilere karışabilir güncelleme almaya devam edecek.
