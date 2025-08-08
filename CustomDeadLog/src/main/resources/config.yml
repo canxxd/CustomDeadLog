@@ -1,0 +1,2 @@
+# Bu eklenti, oyuncuların öldüğünde envanterini kaydeder iade gibi durumlarda işi kolaylaştırır
+aktif: true # false yaparsanız eklenti deaktif pozisyonuna geçer true ise açık demektir default : true

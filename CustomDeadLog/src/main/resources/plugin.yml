@@ -1,0 +1,8 @@
+name: CustomDeadLog
+version: '1.0.1'
+main: org.example1.customDeadLog.CustomDeadLog
+api-version: '1.21'
+prefix: CustomDeadLog
+authors: [Developers by CanXD]
+description: DeadLog
+folia-supported: true
