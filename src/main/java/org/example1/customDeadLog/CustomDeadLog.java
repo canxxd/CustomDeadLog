@@ -17,7 +17,6 @@ import java.util.*;
 
 public class CustomDeadLog extends JavaPlugin implements Listener {
 
-    private File dataDosyasi;
     private final Object kilit = new Object();
 
     @Override
@@ -25,24 +24,16 @@ public class CustomDeadLog extends JavaPlugin implements Listener {
         saveDefaultConfig();
 
         if (!getConfig().getBoolean("aktif", true)) {
-            getLogger().info("DeadLog devre dışı (aktif: false).");
+            getLogger().info("DeadLog devre dışı (aktif: false)");
             return;
         }
 
         Bukkit.getPluginManager().registerEvents(this, this);
 
-        dataDosyasi = new File(getDataFolder(), "data.yml");
-        if (!dataDosyasi.exists()) {
-            try {
-                dataDosyasi.getParentFile().mkdirs();
-                dataDosyasi.createNewFile();
-            } catch (IOException e) {
-                getLogger().severe("data.yml oluşturulamadı");
-                e.printStackTrace();
-            }
-        }
+        File anaKlasor = new File(getDataFolder(), "playerdata");
+        if (!anaKlasor.exists()) anaKlasor.mkdirs();
 
-        getLogger().info("CustomDeadLog aktif Kayıtlar data.yml dosyasına yazılıyor");
+        getLogger().info("deadLog aktıf Kayitlar playerdata klasörüne yazılacaktır");
     }
 
     @EventHandler
@@ -51,10 +42,17 @@ public class CustomDeadLog extends JavaPlugin implements Listener {
 
         Player oyuncu = event.getEntity();
         String isim = oyuncu.getName();
-        String tarih = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+
+        String tarihKlasor = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String zamanDamgasi = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+
+        File gunlukKlasor = new File(getDataFolder(), "playerdata" + File.separator + tarihKlasor);
+        if (!gunlukKlasor.exists()) gunlukKlasor.mkdirs();
+
+        File oyuncuDosyasi = new File(gunlukKlasor, isim + ".yml");
 
         Map<String, Object> olumKaydi = new LinkedHashMap<>();
-        olumKaydi.put("olum-zamani", tarih);
+        olumKaydi.put("olum-zamani", zamanDamgasi);
 
         List<Map<String, Object>> itemList = new ArrayList<>();
         for (ItemStack item : oyuncu.getInventory().getContents()) {
@@ -79,18 +77,18 @@ public class CustomDeadLog extends JavaPlugin implements Listener {
         olumKaydi.put("envanter", itemList);
 
         synchronized (kilit) {
-            YamlConfiguration yml = YamlConfiguration.loadConfiguration(dataDosyasi);
+            YamlConfiguration yml = YamlConfiguration.loadConfiguration(oyuncuDosyasi);
 
-            List<Map<String, Object>> mevcut = (List<Map<String, Object>>) yml.getList(isim);
+            List<Map<String, Object>> mevcut = (List<Map<String, Object>>) yml.getList("olumler");
             if (mevcut == null) mevcut = new ArrayList<>();
 
             mevcut.add(olumKaydi);
-            yml.set(isim, mevcut);
+            yml.set("olumler", mevcut);
 
             try {
-                yml.save(dataDosyasi);
+                yml.save(oyuncuDosyasi);
             } catch (IOException e) {
-                getLogger().warning("data.yml yazılamadı");
+                getLogger().warning(oyuncuDosyasi.getName() + " dosyasına yazılamadı");
                 e.printStackTrace();
             }
         }
